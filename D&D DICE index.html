@@ -3,138 +3,322 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>D&D Adventure Hub</title>
+    <title>D&D Adventure Dashboard</title>
     <style>
-        :root { --primary: #4a90e2; --bg: #f0f2f5; --card: #ffffff; --text: #2c3e50; }
-        body { font-family: 'Segoe UI', system-ui; background: var(--bg); margin: 0; padding-bottom: 70px; }
-        
-        /* 主選單 */
-        nav { 
-            background: #2c3e50; color: white; display: flex; 
-            overflow-x: auto; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        :root {
+            --primary: #e63946;    /* 戰鬥紅 */
+            --secondary: #457b9d;  /* 資訊藍 */
+            --bg: #f1faee;         /* 背景白 */
+            --dark: #1d3557;       /* 深底色 */
+            --card: #ffffff;
         }
-        nav div { padding: 15px 20px; cursor: pointer; flex-shrink: 0; font-weight: bold; font-size: 0.9rem; }
-        nav div.active { background: var(--primary); border-bottom: 3px solid white; }
 
-        .page { display: none; padding: 15px; max-width: 500px; margin: auto; animation: fadeIn 0.3s; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', system-ui;
+            background: var(--bg);
+            margin: 0;
+            padding-bottom: 70px;
+            color: var(--dark);
+        }
 
-        .card { background: var(--card); padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        h2 { font-size: 1.1rem; color: var(--primary); margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 8px; }
-        .data-text { white-space: pre-wrap; font-size: 0.9rem; color: #555; line-height: 1.5; }
-        
+        /* 主導覽列 */
+        nav {
+            background: var(--dark);
+            color: white;
+            display: flex;
+            overflow-x: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        nav div {
+            padding: 15px 20px;
+            cursor: pointer;
+            flex-shrink: 0;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        nav div.active {
+            background: var(--primary);
+            border-bottom: 3px solid white;
+        }
+
+        /* 頁面容器 */
+        .page {
+            display: none;
+            padding: 15px;
+            max-width: 600px;
+            margin: auto;
+            animation: fadeIn 0.4s;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 卡片樣式 */
+        .card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            color: var(--secondary);
+            margin-top: 0;
+            border-left: 4px solid var(--primary);
+            padding-left: 10px;
+            margin-bottom: 15px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-label { font-weight: bold; color: #555; font-size: 0.9rem; }
+        .data-content { white-space: pre-wrap; text-align: right; font-size: 0.95rem; color: var(--dark); }
+
         /* 擲骰專區 */
-        .dice-tray { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; min-height: 80px; margin: 15px 0; }
-        .dice { width: 50px; height: 50px; background: #2c3e50; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; }
-        .shape-20 { clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%); }
-        button.roll-btn { background: var(--primary); color: white; border: none; width: 100%; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .dice-tray {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0;
+            min-height: 60px;
+        }
+
+        .dice {
+            width: 55px;
+            height: 55px;
+            background: var(--dark);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 0 #000;
+        }
+
+        select, input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:active { transform: scale(0.95); opacity: 0.8; }
+
+        .refresh-btn {
+            background: var(--secondary);
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
 <nav id="navbar">
-    <div onclick="switchPage('dice')" class="active">擲骰</div>
-    <div onclick="switchPage('char')">角色</div>
-    <div onclick="switchPage('world')">世界</div>
-    <div onclick="switchPage('quest')">任務</div>
-    <div onclick="switchPage('party')">隊友</div>
+    <div onclick="switchPage('dice')" id="nav-dice" class="active">🎲 擲骰</div>
+    <div onclick="switchPage('char')" id="nav-char">👤 角色</div>
+    <div onclick="switchPage('world')" id="nav-world">🌍 世界</div>
+    <div onclick="switchPage('quest')" id="nav-quest">📜 任務</div>
+    <div onclick="switchPage('party')" id="nav-party">👥 隊友</div>
 </nav>
 
 <div id="dice" class="page active">
     <div class="card">
+        <h2>發起判定</h2>
         <div style="display: flex; gap: 10px;">
-            <select id="diceType" style="flex:1; padding: 10px;">
-                <option value="20">D20</option><option value="6">D6</option><option value="8">D8</option><option value="10">D10</option><option value="12">D12</option><option value="4">D4</option>
+            <select id="diceType">
+                <option value="20">D20 (判定)</option>
+                <option value="6">D6 (傷害)</option>
+                <option value="8">D8</option>
+                <option value="10">D10</option>
+                <option value="12">D12</option>
+                <option value="4">D4</option>
             </select>
-            <input type="number" id="diceCount" value="1" style="width: 60px; padding: 10px;">
+            <input type="number" id="diceCount" value="1" min="1" style="width: 80px;">
         </div>
         <div id="tray" class="dice-tray"></div>
-        <button class="roll-btn" onclick="runRoll()">ROLL DICE</button>
-        <h3 id="total-banner" style="text-align: center; opacity: 0;">Total: 0</h3>
+        <button onclick="runRoll()">ROLL (同步至試算表)</button>
+        <h3 id="total-text" style="text-align:center; display:none;">總計: 0</h3>
     </div>
 </div>
 
 <div id="char" class="page">
     <div class="card">
-        <h2 id="d-Name">角色加載中...</h2>
-        <div class="data-text" id="d-RaceClass">讀取資料中...</div>
-        <div class="data-text" id="d-LevelEXP"></div>
+        <h2>基礎身份</h2>
+        <div class="data-row"><span class="data-label">角色名稱</span><span class="data-content" id="d-Name">讀取中...</span></div>
+        <div class="data-row"><span class="data-label">種族 / 職業</span><span class="data-content" id="d-RaceClass">---</span></div>
+        <div class="data-row"><span class="data-label">等級 / 經驗值</span><span class="data-content" id="d-LevelEXP">---</span></div>
     </div>
     <div class="card">
-        <h2>核心屬性 & 戰鬥</h2>
-        <div class="data-text" id="d-Attributes"></div>
-        <div class="data-text" id="d-HP_AC"></div>
+        <h2>核心屬性 & 生存</h2>
+        <div class="data-row"><span class="data-label">屬性 (六圍)</span><span class="data-content" id="d-Attributes">---</span></div>
+        <div class="data-row"><span class="data-label">HP / AC</span><span class="data-content" id="d-HP_AC">---</span></div>
+        <div class="data-row"><span class="data-label">法術位 / 狀態</span><span class="data-content" id="d-Spells">---</span></div>
     </div>
     <div class="card">
-        <h2>技能、法術與清單</h2>
-        <div class="data-text" id="d-Spells"></div>
+        <h2>清單管理</h2>
+        <b>技能表：</b><p class="data-content" id="d-Skills" style="text-align:left;">---</p>
         <hr>
-        <div class="data-text" id="d-Inventory"></div>
+        <b>物品欄：</b><p class="data-content" id="d-Inventory" style="text-align:left;">---</p>
     </div>
+    <button class="refresh-btn" onclick="loadAllData()">手動更新數據</button>
 </div>
 
 <div id="world" class="page">
-    <div class="card"><h2>主要地區與城鎮</h2><div class="data-text" id="d-Regions"></div><div class="data-text" id="d-Towns"></div></div>
-    <div class="card"><h2>主要 NPC</h2><div class="data-text" id="d-NPCs"></div></div>
+    <div class="card">
+        <h2>主要地區與城鎮</h2>
+        <p id="d-Regions" class="data-content" style="text-align:left;">---</p>
+        <p id="d-Towns" class="data-content" style="text-align:left;">---</p>
+    </div>
+    <div class="card">
+        <h2>重要 NPC</h2>
+        <p id="d-NPCs" class="data-content" style="text-align:left;">---</p>
+    </div>
+    <button class="refresh-btn" onclick="loadAllData()">手動更新數據</button>
 </div>
 
 <div id="quest" class="page">
-    <div class="card"><h2>當前位置</h2><div class="data-text" id="d-Location"></div></div>
-    <div class="card"><h2>任務狀態</h2><b>主線：</b><div class="data-text" id="d-Main"></div><br><b>支線：</b><div class="data-text" id="d-Current"></div></div>
+    <div class="card">
+        <h2>當前位置</h2>
+        <p id="d-Location" class="data-content" style="text-align:left; font-weight:bold;">---</p>
+    </div>
+    <div class="card">
+        <h2>任務日誌</h2>
+        <b>主線任務：</b><p id="d-Main" class="data-content" style="text-align:left;">---</p>
+        <b>目前任務：</b><p id="d-Current" class="data-content" style="text-align:left;">---</p>
+        <b>已完成：</b><p id="d-Completed" class="data-content" style="text-align:left; color:gray;">---</p>
+    </div>
+    <button class="refresh-btn" onclick="loadAllData()">手動更新數據</button>
 </div>
 
 <div id="party" class="page">
-    <div class="card"><h2>隊伍成員</h2><div class="data-text" id="d-Members"></div></div>
+    <div class="card">
+        <h2>冒險小隊</h2>
+        <p id="d-Members" class="data-content" style="text-align:left;">---</p>
+    </div>
+    <button class="refresh-btn" onclick="loadAllData()">手動更新數據</button>
 </div>
 
 <script>
+    // ⚠️ 請確保這是你最新的 GAS 網址
     const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbyBI7TAjMQ0fuXluamUxbRrCAXCzmaxkODIix9QJI6Oi7OnD5LhGf-U_RxQgo8Z1CqtYg/exec';
 
+    // 分頁切換邏輯
     function switchPage(id) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('nav div').forEach(d => d.classList.remove('active'));
+        
         document.getElementById(id).classList.add('active');
-        event.currentTarget.classList.add('active');
-        if(id !== 'dice') refreshData();
+        document.getElementById('nav-' + id).classList.add('active');
+        
+        // 切換到非擲骰頁面時，自動抓取最新數據
+        if (id !== 'dice') {
+            loadAllData();
+        }
     }
 
-    async function refreshData() {
+    // 從試算表抓取所有數據
+    async function loadAllData() {
         try {
-            const res = await fetch(GOOGLE_URL);
-            const data = await res.json();
-            // 自動填充所有 ID 開頭為 d- 的元素
-            for (let sheet in data) {
-                for (let item in data[sheet]) {
-                    const el = document.getElementById('d-' + item);
-                    if (el) el.innerText = data[sheet][item];
+            const response = await fetch(GOOGLE_URL);
+            const data = await response.json();
+            
+            // 遍歷所有分頁數據並填充到 HTML
+            for (let sheetName in data) {
+                for (let key in data[sheetName]) {
+                    const element = document.getElementById('d-' + key);
+                    if (element) {
+                        element.innerText = data[sheetName][key] || "無資料";
+                    }
                 }
             }
-        } catch (e) { console.error("Load Error"); }
+        } catch (error) {
+            console.error("數據讀取失敗:", error);
+        }
     }
 
-    function runRoll() {
+    // 擲骰功能與同步
+    async function runRoll() {
         const type = document.getElementById('diceType').value;
-        const count = document.getElementById('diceCount').value;
+        const count = parseInt(document.getElementById('diceCount').value);
         const tray = document.getElementById('tray');
+        
+        if (isNaN(count) || count < 1) return;
+
         tray.innerHTML = '';
         let results = [];
         let total = 0;
-        for(let i=0; i<count; i++) {
+
+        // 產出隨機結果
+        for (let i = 0; i < count; i++) {
             const val = Math.floor(Math.random() * type) + 1;
-            results.push(val); total += val;
-            const d = document.createElement('div');
-            d.className = `dice shape-${type}`;
-            d.innerText = val;
-            tray.appendChild(d);
+            results.push(val);
+            total += val;
+
+            const diceEl = document.createElement('div');
+            diceEl.className = 'dice';
+            diceEl.innerText = val;
+            tray.appendChild(diceEl);
         }
-        document.getElementById('total-banner').innerText = "Total: " + total;
-        document.getElementById('total-banner').style.opacity = 1;
-        fetch(GOOGLE_URL, {
-            method: 'POST',
-            body: JSON.stringify({ targetSheet: "CurrentRoll", combo: count + "D" + type, list: results.join(", ") })
-        });
+
+        document.getElementById('total-text').style.display = 'block';
+        document.getElementById('total-text').innerText = "總計: " + total;
+
+        // 同步到試算表 (CurrentRoll 分頁)
+        try {
+            await fetch(GOOGLE_URL, {
+                method: 'POST',
+                mode: 'no-cors', // 解決跨網域問題
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    targetSheet: "CurrentRoll",
+                    combo: count + "D" + type,
+                    list: results.join(", ")
+                })
+            });
+        } catch (e) {
+            console.log("上傳失敗，但擲骰已完成");
+        }
     }
+
+    // 初始化讀取
+    window.onload = () => {
+        // 如果有初始資料需求可以在此執行
+    };
 </script>
+
 </body>
 </html>
